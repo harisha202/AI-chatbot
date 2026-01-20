@@ -1,0 +1,452 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Welcome - AI Personal Assistant</title>
+  <link href="https://fonts.googleapis.com/css2?family=Exo+2:wght@300;400;600;700&family=Orbitron:wght@400;700;900&family=Audiowide&display=swap" rel="stylesheet">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body {
+      font-family: 'Exo 2', -apple-system, BlinkMacSystemFont, sans-serif;
+      background: linear-gradient(135deg, #0a0a1e 0%, #162447 50%, #0a0a1e 100%);
+      color: #ffffff;
+      overflow: hidden;
+      height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+    }
+    
+    body::before {
+      content: '';
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: repeating-linear-gradient(
+        0deg,
+        transparent,
+        transparent 2px,
+        rgba(30, 144, 255, 0.03) 2px,
+        rgba(30, 144, 255, 0.03) 4px
+      );
+      pointer-events: none;
+      z-index: 1;
+    }
+    
+    #welcome-canvas {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 0;
+    }
+    
+    .welcome-content {
+      position: relative;
+      z-index: 2;
+      text-align: center;
+      max-width: 700px;
+      padding: 40px;
+      animation: fadeInUp 1.5s ease forwards;
+    }
+    
+    @keyframes fadeInUp {
+      from {
+        opacity: 0;
+        transform: translateY(50px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+    
+    .ai-avatar-container {
+      margin-bottom: 40px;
+      display: flex;
+      justify-content: center;
+    }
+    
+    .ai-avatar {
+      position: relative;
+      width: 200px;
+      height: 200px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    
+    .avatar-ring {
+      position: absolute;
+      border: 2px solid;
+      border-radius: 50%;
+      animation: rotate 4s linear infinite;
+    }
+    
+    .ring-1 {
+      width: 180px;
+      height: 180px;
+      border-color: #1e90ff transparent #4169e1 transparent;
+      animation-duration: 3s;
+    }
+    
+    .ring-2 {
+      width: 140px;
+      height: 140px;
+      border-color: #00bfff transparent #5f9ee1 transparent;
+      animation-duration: 4s;
+      animation-direction: reverse;
+    }
+    
+    .ring-3 {
+      width: 100px;
+      height: 100px;
+      border-color: #4682b4 transparent #6495ed transparent;
+      animation-duration: 5s;
+    }
+    
+    @keyframes rotate {
+      from { transform: rotate(0deg); }
+      to { transform: rotate(360deg); }
+    }
+    
+    .avatar-core {
+      position: relative;
+      z-index: 10;
+      width: 120px;
+      height: 120px;
+      border-radius: 50%;
+      overflow: hidden;
+      animation: pulse 2s ease-in-out infinite;
+      filter: drop-shadow(0 0 30px rgba(30, 144, 255, 0.8));
+      background: rgba(10, 10, 30, 0.5);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    
+    .avatar-core img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      border-radius: 50%;
+    }
+    
+    @keyframes pulse {
+      0%, 100% {
+        transform: scale(1);
+      }
+      50% {
+        transform: scale(1.08);
+      }
+    }
+    
+    .welcome-title {
+      font-family: 'Audiowide', sans-serif;
+      font-size: 3rem;
+      background: linear-gradient(90deg, #1e90ff, #4169e1, #00bfff, #5f9ee1);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin-bottom: 20px;
+      letter-spacing: 2px;
+      animation: gradientShift 3s ease infinite;
+      background-size: 200% auto;
+    }
+    
+    @keyframes gradientShift {
+      0%, 100% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+    }
+    
+    .welcome-subtitle {
+      font-size: 1.5rem;
+      color: #b0b0b0;
+      margin-bottom: 40px;
+      animation: fadeIn 2s ease forwards;
+      animation-delay: 0.5s;
+      opacity: 0;
+    }
+    
+    @keyframes fadeIn {
+      to { opacity: 1; }
+    }
+    
+    .loading-container {
+      margin-top: 40px;
+      opacity: 0;
+      animation: fadeIn 1s ease forwards;
+      animation-delay: 1s;
+    }
+    
+    .loading-text {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 1.2rem;
+      color: #1e90ff;
+      margin-bottom: 15px;
+      letter-spacing: 2px;
+      animation: blink 1.5s ease infinite;
+    }
+    
+    @keyframes blink {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.5; }
+    }
+    
+    .loading-bar {
+      width: 300px;
+      height: 6px;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 10px;
+      overflow: hidden;
+      margin: 0 auto;
+      position: relative;
+      box-shadow: 0 0 10px rgba(30, 144, 255, 0.3);
+    }
+    
+    .loading-progress {
+      height: 100%;
+      background: linear-gradient(90deg, #1e90ff, #4169e1, #00bfff, #5f9ee1);
+      border-radius: 10px;
+      animation: loadProgress 12s ease forwards;
+      box-shadow: 0 0 20px rgba(30, 144, 255, 0.8);
+    }
+    
+    @keyframes loadProgress {
+      from { width: 0%; }
+      to { width: 100%; }
+    }
+    
+    .loading-percentage {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 1rem;
+      color: #1e90ff;
+      margin-top: 10px;
+      letter-spacing: 2px;
+    }
+    
+    .particle {
+      position: absolute;
+      width: 4px;
+      height: 4px;
+      background: #1e90ff;
+      border-radius: 50%;
+      pointer-events: none;
+      animation: floatParticle 3s ease-in-out infinite;
+      box-shadow: 0 0 10px rgba(30, 144, 255, 0.8);
+    }
+    
+    @keyframes floatParticle {
+      0%, 100% {
+        transform: translateY(0) translateX(0);
+        opacity: 0;
+      }
+      50% {
+        opacity: 1;
+      }
+    }
+    
+    body.fade-out {
+      animation: fadeOut 0.5s ease forwards;
+    }
+    
+    @keyframes fadeOut {
+      to { opacity: 0; }
+    }
+    
+    @media (max-width: 768px) {
+      .welcome-title {
+        font-size: 2rem;
+      }
+      
+      .welcome-subtitle {
+        font-size: 1.2rem;
+      }
+      
+      .ai-avatar {
+        width: 150px;
+        height: 150px;
+      }
+      
+      .avatar-core {
+        width: 90px;
+        height: 90px;
+      }
+      
+      .ring-1 { width: 140px; height: 140px; }
+      .ring-2 { width: 100px; height: 100px; }
+      .ring-3 { width: 70px; height: 70px; }
+      
+      .loading-bar {
+        width: 250px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <canvas id="welcome-canvas"></canvas>
+  <div class="welcome-content">
+    <div class="ai-avatar-container">
+      <div class="ai-avatar">
+        <div class="avatar-ring ring-1"></div>
+        <div class="avatar-ring ring-2"></div>
+        <div class="avatar-ring ring-3"></div>
+        <div class="avatar-core">
+          <img src="https://i.pinimg.com/originals/4b/06/e3/4b06e393fd0647c265b1282b0f006486.gif" alt="AI Animation">
+        </div>
+      </div>
+    </div>
+    
+    <h1 class="welcome-title">Hi! I'm Your Personal Assistant</h1>
+    <p class="welcome-subtitle">Welcome! I'm here to help you with anything you need.</p>
+    
+    <div class="loading-container">
+      <p class="loading-text">INITIALIZING AI SYSTEMS...</p>
+      <div class="loading-bar">
+        <div class="loading-progress"></div>
+      </div>
+      <p class="loading-percentage" id="percentage">0%</p>
+    </div>
+  </div>
+  
+  <script>
+    const canvas = document.getElementById('welcome-canvas');
+    const ctx = canvas.getContext('2d');
+    
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+    
+    const particles = [];
+    const particleCount = 150;
+    
+    class Particle3D {
+      constructor() {
+        this.x = Math.random() * canvas.width;
+        this.y = Math.random() * canvas.height;
+        this.z = Math.random() * 1000;
+        this.vx = (Math.random() - 0.5) * 0.5;
+        this.vy = (Math.random() - 0.5) * 0.5;
+        this.vz = Math.random() * 2 + 1;
+        this.radius = Math.random() * 2 + 1;
+        this.color = ['#1e90ff', '#4169e1', '#00bfff', '#5f9ee1'][Math.floor(Math.random() * 4)];
+      }
+      
+      update() {
+        this.x += this.vx;
+        this.y += this.vy;
+        this.z -= this.vz;
+        
+        if (this.z < 1) {
+          this.z = 1000;
+          this.x = Math.random() * canvas.width;
+          this.y = Math.random() * canvas.height;
+        }
+        
+        if (this.x < 0 || this.x > canvas.width) this.vx *= -1;
+        if (this.y < 0 || this.y > canvas.height) this.vy *= -1;
+      }
+      
+      draw() {
+        const scale = 1000 / (1000 + this.z);
+        const x = (this.x - canvas.width / 2) * scale + canvas.width / 2;
+        const y = (this.y - canvas.height / 2) * scale + canvas.height / 2;
+        const radius = this.radius * scale;
+        
+        ctx.beginPath();
+        ctx.arc(x, y, radius, 0, Math.PI * 2);
+        ctx.fillStyle = this.color;
+        ctx.globalAlpha = 1 - this.z / 1000;
+        ctx.fill();
+        ctx.globalAlpha = 1;
+      }
+    }
+    
+    for (let i = 0; i < particleCount; i++) {
+      particles.push(new Particle3D());
+    }
+    
+    function connectParticles() {
+      for (let i = 0; i < particles.length; i++) {
+        for (let j = i + 1; j < particles.length; j++) {
+          const dx = particles[i].x - particles[j].x;
+          const dy = particles[i].y - particles[j].y;
+          const distance = Math.sqrt(dx * dx + dy * dy);
+          
+          if (distance < 100) {
+            ctx.beginPath();
+            ctx.strokeStyle = `rgba(30, 144, 255, ${0.3 * (1 - distance / 100)})`;
+            ctx.lineWidth = 0.5;
+            ctx.moveTo(particles[i].x, particles[i].y);
+            ctx.lineTo(particles[j].x, particles[j].y);
+            ctx.stroke();
+          }
+        }
+      }
+    }
+    
+    function animate() {
+      ctx.fillStyle = 'rgba(10, 10, 30, 0.1)';
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+      
+      particles.forEach(p => {
+        p.update();
+        p.draw();
+      });
+      
+      connectParticles();
+      requestAnimationFrame(animate);
+    }
+    
+    animate();
+    
+    window.addEventListener('resize', () => {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+    });
+    
+    let percentage = 0;
+    const percentageElement = document.getElementById('percentage');
+    const percentageInterval = setInterval(() => {
+      if (percentage < 100) {
+        percentage += 1;
+        percentageElement.textContent = percentage + '%';
+      } else {
+        clearInterval(percentageInterval);
+      }
+    }, 120);
+    
+    
+    setTimeout(() => {
+      document.body.classList.add('fade-out');
+      setTimeout(() => {
+        window.location.href = "{{ url_for('intex') }}";
+      }, 500);
+    }, 12000);
+    
+    
+    function createFloatingParticles() {
+      for (let i = 0; i < 30; i++) {
+        const particle = document.createElement('div');
+        particle.className = 'particle';
+        particle.style.left = Math.random() * 100 + '%';
+        particle.style.top = Math.random() * 100 + '%';
+        particle.style.animationDelay = Math.random() * 3 + 's';
+        particle.style.animationDuration = (Math.random() * 3 + 2) + 's';
+        document.body.appendChild(particle);
+      }
+    }
+    
+    createFloatingParticles();
+  </script>
+</body>
+</html>

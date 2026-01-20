@@ -1,0 +1,644 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Signup Portal</title>
+    <link href="https://fonts.googleapis.com/css2?family=Exo+2:wght@300;400;600;700&family=Orbitron:wght@700;900&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Exo 2', sans-serif;
+            background-color: #0a0a0a;
+            color: #fff;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        #neural-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+            opacity: 0.4;
+        }
+
+        body::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: repeating-linear-gradient(
+                to bottom,
+                transparent 0px,
+                transparent 1px,
+                rgba(255, 0, 255, 0.05) 1px,
+                rgba(255, 0, 255, 0.05) 2px
+            );
+            pointer-events: none;
+            animation: scan 4s linear infinite;
+            z-index: 1;
+        }
+
+        @keyframes scan {
+            0% { background-position: 0 0; }
+            100% { background-position: 0 100%; }
+        }
+
+        .portal {
+            position: relative;
+            width: 90%;
+            max-width: 550px;
+            padding: 3rem 3rem;
+            background: rgba(20, 10, 30, 0.95);
+            border-radius: 20px;
+            border: 2px solid rgba(255, 0, 255, 0.4);
+            box-shadow: 
+                0 0 40px rgba(255, 0, 255, 0.3),
+                0 0 80px rgba(200, 0, 255, 0.2),
+                inset 0 0 20px rgba(255, 0, 255, 0.1);
+            z-index: 2;
+            backdrop-filter: blur(15px);
+            transition: transform 0.3s ease;
+            animation: fadeIn 0.8s ease;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: scale(0.95);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        .portal:hover {
+            transform: translateY(-5px);
+            box-shadow: 
+                0 0 50px rgba(255, 0, 255, 0.4),
+                0 0 100px rgba(200, 0, 255, 0.3);
+        }
+
+        h1 {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+            background: linear-gradient(90deg, #ff00ff, #d400ff, #ff0080);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            text-shadow: 0 0 30px rgba(255, 0, 255, 0.5);
+            letter-spacing: 3px;
+            font-weight: 900;
+            text-align: center;
+        }
+
+        .tagline {
+            color: #dd88ff;
+            margin-bottom: 2rem;
+            font-size: 0.95rem;
+            letter-spacing: 1px;
+            opacity: 0.9;
+            text-align: center;
+        }
+
+        .input-box {
+            margin-bottom: 1.5rem;
+            text-align: left;
+        }
+
+        .input-box label {
+            font-size: 0.85rem;
+            color: #dd88ff;
+            margin-bottom: 8px;
+            display: block;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .input-box input {
+            width: 100%;
+            padding: 14px 18px;
+            border-radius: 10px;
+            border: 2px solid rgba(255, 0, 255, 0.3);
+            background: rgba(10, 5, 15, 0.8);
+            color: #fff;
+            font-size: 1rem;
+            font-family: 'Exo 2', sans-serif;
+            transition: all 0.3s ease;
+        }
+
+        .input-box input:focus {
+            outline: none;
+            border-color: #ff00ff;
+            background: rgba(30, 10, 40, 0.9);
+            box-shadow: 0 0 20px rgba(255, 0, 255, 0.4);
+        }
+
+        .input-box input::placeholder {
+            color: #777;
+        }
+
+        .error {
+            font-size: 0.8rem;
+            color: #ff6b6b;
+            margin-top: 6px;
+            display: block;
+        }
+
+        button {
+            width: 100%;
+            padding: 14px;
+            border: none;
+            border-radius: 10px;
+            font-size: 1rem;
+            font-weight: 700;
+            font-family: 'Orbitron', sans-serif;
+            background: linear-gradient(135deg, #ff00ff, #d400ff);
+            color: #fff;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-top: 10px;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 5px 20px rgba(255, 0, 255, 0.4);
+        }
+
+        button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 30px rgba(255, 0, 255, 0.6);
+        }
+
+        button:disabled {
+            background: #555;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .success-message {
+            color: #00ff88;
+            margin-top: 15px;
+            padding: 12px;
+            background: rgba(0, 255, 136, 0.15);
+            border: 2px solid #00ff88;
+            border-radius: 8px;
+            text-align: center;
+            font-weight: 600;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .button-container {
+            margin-top: 1.5rem;
+            text-align: center;
+        }
+
+        .access-btn {
+            display: inline-block;
+            padding: 12px 30px;
+            color: #ff00ff;
+            text-decoration: none;
+            font-weight: 600;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            border: 2px solid #ff00ff;
+            border-radius: 10px;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.3s ease;
+            font-size: 0.9rem;
+        }
+
+        .access-btn:hover {
+            background: rgba(255, 0, 255, 0.2);
+            box-shadow: 0 0 25px rgba(255, 0, 255, 0.5);
+            transform: translateY(-3px);
+        }
+
+        .access-btn::before,
+        .access-btn::after {
+            content: '';
+            position: absolute;
+            width: 15px;
+            height: 15px;
+            transition: all 0.3s ease;
+        }
+
+        .access-btn::before {
+            top: -2px;
+            left: -2px;
+            border-top: 2px solid #ff00ff;
+            border-left: 2px solid #ff00ff;
+        }
+
+        .access-btn::after {
+            bottom: -2px;
+            right: -2px;
+            border-bottom: 2px solid #ff00ff;
+            border-right: 2px solid #ff00ff;
+        }
+
+        .access-btn:hover::before,
+        .access-btn:hover::after {
+            width: calc(100% + 4px);
+            height: calc(100% + 4px);
+        }
+
+        .loading {
+            display: inline-block;
+            width: 18px;
+            height: 18px;
+            border: 3px solid rgba(255, 255, 255, 0.2);
+            border-top: 3px solid #fff;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-right: 10px;
+            vertical-align: middle;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        @media (max-width: 600px) {
+            h1 { 
+                font-size: 2rem; 
+                letter-spacing: 2px;
+            }
+            .portal { 
+                padding: 2.5rem 2rem; 
+                max-width: 90%;
+            }
+            .access-btn { 
+                padding: 10px 25px; 
+                font-size: 0.85rem; 
+            }
+            .tagline {
+                font-size: 0.9rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <canvas id="neural-bg"></canvas>
+
+    <div class="portal">
+        <h1>✨ CREATE ACCOUNT</h1>
+        <p class="tagline">Join the AI-powered future</p>
+        
+        <form id="signupForm" onsubmit="return handleSignup(event)">
+            <div class="input-box">
+                <label for="username">Username</label>
+                <input type="text" id="username" placeholder="Choose a username" required>
+                <span id="usernameError" class="error"></span>
+            </div>
+            
+            <div class="input-box">
+                <label for="email">Email Address</label>
+                <input type="email" id="email" placeholder="your.email@example.com" required>
+                <span id="emailError" class="error"></span>
+            </div>
+            
+            <div class="input-box">
+                <label for="password">Password</label>
+                <input type="password" id="password" placeholder="Create a strong password" required>
+                <span id="passwordError" class="error"></span>
+            </div>
+            
+            <div class="input-box">
+                <label for="confirm-password">Confirm Password</label>
+                <input type="password" id="confirm-password" placeholder="Confirm your password" required>
+                <span id="confirmPasswordError" class="error"></span>
+            </div>
+            
+            <button type="submit" id="submitBtn">Sign Up</button>
+            <div id="signupSuccess" class="success-message hidden"></div>
+        </form>
+        
+        <div class="button-container">
+            <a href="{{ url_for('login') }}" class="access-btn">🔐 Login</a>
+        </div>
+    </div>
+
+    <script>
+        // Neural Network Background
+     // Advanced AI Neural Network Animation
+        const canvas = document.getElementById('neural-bg');
+        const ctx = canvas.getContext('2d');
+        
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+        
+        const neurons = [];
+        const neuronCount = 60;
+        const connectionDistance = 180;
+        const dataPackets = [];
+        let time = 0;
+        
+        class Neuron {
+            constructor() {
+                this.x = Math.random() * canvas.width;
+                this.y = Math.random() * canvas.height;
+                this.vx = (Math.random() - 0.5) * 0.4;
+                this.vy = (Math.random() - 0.5) * 0.4;
+                this.radius = Math.random() * 2.5 + 1.5;
+                this.connections = [];
+                this.pulsePhase = Math.random() * Math.PI * 2;
+                this.activated = false;
+                this.activationTime = 0;
+            }
+            
+            update() {
+                this.x += this.vx;
+                this.y += this.vy;
+                
+                if (this.x < 0 || this.x > canvas.width) this.vx *= -1;
+                if (this.y < 0 || this.y > canvas.height) this.vy *= -1;
+                
+                // Random activation
+                if (Math.random() < 0.002) {
+                    this.activated = true;
+                    this.activationTime = time;
+                }
+                
+                if (this.activated && time - this.activationTime > 60) {
+                    this.activated = false;
+                }
+            }
+            
+            draw() {
+                const pulse = Math.sin(time * 0.05 + this.pulsePhase) * 0.3 + 0.7;
+                const glowSize = this.activated ? this.radius * 4 : this.radius * 2;
+                
+                // Outer glow
+                const gradient = ctx.createRadialGradient(this.x, this.y, 0, this.x, this.y, glowSize);
+                if (this.activated) {
+                    gradient.addColorStop(0, 'rgba(0, 255, 255, 0.8)');
+                    gradient.addColorStop(0.5, 'rgba(0, 180, 255, 0.4)');
+                    gradient.addColorStop(1, 'rgba(0, 150, 255, 0)');
+                } else {
+                    gradient.addColorStop(0, `rgba(0, 200, 255, ${0.6 * pulse})`);
+                    gradient.addColorStop(0.5, `rgba(0, 150, 255, ${0.3 * pulse})`);
+                    gradient.addColorStop(1, 'rgba(0, 180, 255, 0)');
+                }
+                
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, glowSize, 0, Math.PI * 2);
+                ctx.fillStyle = gradient;
+                ctx.fill();
+                
+                // Core
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.radius * pulse, 0, Math.PI * 2);
+                ctx.fillStyle = this.activated ? '#00ffff' : '#00b4ff';
+                ctx.shadowBlur = this.activated ? 20 : 10;
+                ctx.shadowColor = this.activated ? '#00ffff' : '#00b4ff';
+                ctx.fill();
+                ctx.shadowBlur = 0;
+            }
+        }
+        
+        class DataPacket {
+            constructor(x1, y1, x2, y2) {
+                this.x = x1;
+                this.y = y1;
+                this.targetX = x2;
+                this.targetY = y2;
+                this.progress = 0;
+                this.speed = 0.02 + Math.random() * 0.03;
+                this.size = 2;
+                this.color = Math.random() > 0.5 ? '#00ffff' : '#0099ff';
+            }
+            
+            update() {
+                this.progress += this.speed;
+                this.x = this.x + (this.targetX - this.x) * this.speed;
+                this.y = this.y + (this.targetY - this.y) * this.speed;
+            }
+            
+            draw() {
+                if (this.progress < 1) {
+                    ctx.beginPath();
+                    ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                    ctx.fillStyle = this.color;
+                    ctx.shadowBlur = 10;
+                    ctx.shadowColor = this.color;
+                    ctx.fill();
+                    ctx.shadowBlur = 0;
+                    
+                    // Trail effect
+                    ctx.beginPath();
+                    ctx.arc(this.x, this.y, this.size * 2, 0, Math.PI * 2);
+                    ctx.fillStyle = this.color.replace(')', ', 0.2)').replace('rgb', 'rgba');
+                    ctx.fill();
+                }
+            }
+            
+            isDead() {
+                return this.progress >= 1;
+            }
+        }
+        
+        // Initialize neurons
+        for (let i = 0; i < neuronCount; i++) {
+            neurons.push(new Neuron());
+        }
+        
+        function createConnections() {
+            neurons.forEach(n => n.connections = []);
+            
+            for (let i = 0; i < neurons.length; i++) {
+                for (let j = i + 1; j < neurons.length; j++) {
+                    const dx = neurons[i].x - neurons[j].x;
+                    const dy = neurons[i].y - neurons[j].y;
+                    const distance = Math.sqrt(dx * dx + dy * dy);
+                    
+                    if (distance < connectionDistance) {
+                        neurons[i].connections.push(j);
+                        
+                        // Occasionally create data packets
+                        if (Math.random() < 0.001) {
+                            dataPackets.push(new DataPacket(
+                                neurons[i].x, neurons[i].y,
+                                neurons[j].x, neurons[j].y
+                            ));
+                        }
+                    }
+                }
+            }
+        }
+        
+        function drawConnections() {
+            for (let i = 0; i < neurons.length; i++) {
+                neurons[i].connections.forEach(j => {
+                    const dx = neurons[i].x - neurons[j].x;
+                    const dy = neurons[i].y - neurons[j].y;
+                    const distance = Math.sqrt(dx * dx + dy * dy);
+                    const opacity = 0.4 * (1 - distance / connectionDistance);
+                    
+                    // Animated connection strength
+                    const pulseStrength = (neurons[i].activated || neurons[j].activated) ? 0.8 : opacity;
+                    const lineWidth = (neurons[i].activated || neurons[j].activated) ? 1.5 : 0.7;
+                    
+                    ctx.beginPath();
+                    ctx.strokeStyle = (neurons[i].activated || neurons[j].activated) 
+                        ? `rgba(0, 255, 255, ${pulseStrength})` 
+                        : `rgba(0, 180, 255, ${pulseStrength})`;
+                    ctx.lineWidth = lineWidth;
+                    ctx.moveTo(neurons[i].x, neurons[i].y);
+                    ctx.lineTo(neurons[j].x, neurons[j].y);
+                    ctx.stroke();
+                });
+            }
+        }
+        
+        function animate() {
+            time++;
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            // Add subtle background gradient
+            const bgGradient = ctx.createRadialGradient(
+                canvas.width / 2, canvas.height / 2, 0,
+                canvas.width / 2, canvas.height / 2, canvas.width / 2
+            );
+            bgGradient.addColorStop(0, 'rgba(20, 0, 40, 0.02)');
+            bgGradient.addColorStop(1, 'rgba(0, 0, 0, 0)');
+            ctx.fillStyle = bgGradient;
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            
+            createConnections();
+            drawConnections();
+            
+            neurons.forEach(neuron => {
+                neuron.update();
+                neuron.draw();
+            });
+            
+            // Update and draw data packets
+            for (let i = dataPackets.length - 1; i >= 0; i--) {
+                dataPackets[i].update();
+                dataPackets[i].draw();
+                
+                if (dataPackets[i].isDead()) {
+                    dataPackets.splice(i, 1);
+                }
+            }
+            
+            requestAnimationFrame(animate);
+        }
+        
+        animate();
+        
+        window.addEventListener('resize', () => {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        });
+
+        // Form handling
+        async function handleSignup(event) {
+            event.preventDefault();
+            
+            const username = document.getElementById('username').value.trim();
+            const email = document.getElementById('email').value.trim();
+            const password = document.getElementById('password').value;
+            const confirmPassword = document.getElementById('confirm-password').value;
+            
+            const usernameError = document.getElementById('usernameError');
+            const emailError = document.getElementById('emailError');
+            const passwordError = document.getElementById('passwordError');
+            const confirmPasswordError = document.getElementById('confirmPasswordError');
+            const signupSuccess = document.getElementById('signupSuccess');
+            const submitBtn = document.getElementById('submitBtn');
+
+            // Clear errors
+            usernameError.textContent = '';
+            emailError.textContent = '';
+            passwordError.textContent = '';
+            confirmPasswordError.textContent = '';
+            signupSuccess.classList.add('hidden');
+
+            let hasError = false;
+
+            if (username.length < 3) {
+                usernameError.textContent = 'Username must be at least 3 characters!';
+                hasError = true;
+            }
+
+            const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (!email) {
+                emailError.textContent = 'Email is required!';
+                hasError = true;
+            } else if (!emailPattern.test(email)) {
+                emailError.textContent = 'Please enter a valid email!';
+                hasError = true;
+            }
+
+            if (password.length < 6) {
+                passwordError.textContent = 'Password must be at least 6 characters!';
+                hasError = true;
+            }
+
+            if (password !== confirmPassword) {
+                confirmPasswordError.textContent = 'Passwords do not match!';
+                hasError = true;
+            }
+
+            if (hasError) return false;
+
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<span class="loading"></span>Creating Account...';
+
+            try {
+                const response = await fetch('/signup', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ username, email, password })
+                });
+
+                const result = await response.json();
+
+                if (response.ok && result.success) {
+                    signupSuccess.classList.remove('hidden');
+                    signupSuccess.textContent = '✨ Account created! Redirecting to login...';
+                    
+                    setTimeout(() => {
+                        window.location.href = result.redirect_url || '/login';
+                    }, 2000);
+                } else {
+                    usernameError.textContent = result.message || 'Signup failed. Please try again.';
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                usernameError.textContent = 'Network error. Please try again.';
+            } finally {
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = 'Sign Up';
+            }
+
+            return false;
+        }
+    </script>
+</body>
+</html>

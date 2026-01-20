@@ -1,0 +1,581 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Chat History — AI Assistant</title>
+  <link href="https://fonts.googleapis.com/css2?family=Exo+2:wght@300;400;600;700&family=Orbitron:wght@400;700;900&family=Audiowide&display=swap" rel="stylesheet">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    
+    :root{
+      --primary: #00b7c7;
+      --secondary: #c000c7;
+      --accent: #00a86b;
+      --danger: #d94b4b;
+      --bg-dark: #03030a;
+      --text: #dfeff3;
+    }
+
+    body {
+      font-family: 'Exo 2', system-ui, sans-serif;
+      color: var(--text);
+      background: var(--bg-dark);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      z-index: -3;
+      background:
+        radial-gradient(1000px 500px at 10% 20%, rgba(0,183,199,0.035), transparent 14%),
+        linear-gradient(180deg, rgba(4,4,10,0.96), rgba(6,6,12,0.96));
+      pointer-events: none;
+    }
+
+    #neural-bg {
+      position: fixed;
+      inset: 0;
+      z-index: -1;
+      opacity: 0.85;
+      pointer-events: none;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 1350px;
+      margin: 28px;
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+      z-index: 2;
+    }
+
+    h1 {
+      font-family: 'Audiowide', sans-serif;
+      font-size: 38px;
+      letter-spacing: 2px;
+      font-weight: 700;
+      text-align: center;
+      background: linear-gradient(90deg, var(--primary), var(--secondary), var(--accent));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin-top: 8px;
+    }
+
+    .header-card {
+      background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.007));
+      border: 1px solid rgba(255,255,255,0.02);
+      padding: 14px 18px;
+      border-radius: 12px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      color: var(--primary);
+      box-shadow: 0 8px 26px rgba(0,0,0,0.6);
+      backdrop-filter: blur(6px);
+    }
+
+    .meta {
+      font-weight: 700;
+      color: var(--primary);
+      font-size: 15px;
+    }
+
+    .sub {
+      font-size: 13px;
+      color: #7f95a0;
+      font-weight: 500;
+    }
+
+    .controls {
+      display: flex;
+      justify-content: center;
+      gap: 14px;
+      flex-wrap: wrap;
+    }
+
+    .btn {
+      padding: 14px 28px;
+      border: none;
+      border-radius: 10px;
+      font-size: 15px;
+      font-weight: 600;
+      font-family: 'Exo 2', sans-serif;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.4);
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, var(--primary), rgba(0,183,199,0.7));
+      color: #fff;
+      border: 1px solid rgba(0,183,199,0.3);
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 6px 25px rgba(0,183,199,0.5);
+    }
+
+    .btn-danger {
+      background: linear-gradient(135deg, var(--danger), rgba(217,75,75,0.7));
+      color: #fff;
+      border: 1px solid rgba(217,75,75,0.3);
+    }
+
+    .btn-danger:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 6px 25px rgba(217,75,75,0.5);
+    }
+
+    .history-table {
+      width: 100%;
+      border-radius: 12px;
+      overflow: hidden;
+      background: linear-gradient(180deg, rgba(8,10,18,0.68), rgba(10,12,20,0.52));
+      box-shadow: 0 10px 40px rgba(0,0,0,0.6);
+      border: 1px solid rgba(255,255,255,0.02);
+      backdrop-filter: blur(6px);
+    }
+
+    table { 
+      width: 100%; 
+      border-collapse: collapse; 
+    }
+
+    thead th {
+      padding: 16px 18px;
+      background: rgba(0,183,199,0.08);
+      color: var(--primary);
+      font-weight: 700;
+      text-align: left;
+      border-bottom: 2px solid rgba(0,183,199,0.2);
+      font-size: 14px;
+    }
+
+    tbody td {
+      padding: 16px 18px;
+      color: var(--text);
+      border-bottom: 1px solid rgba(255,255,255,0.05);
+      vertical-align: top;
+      font-size: 15px;
+      word-wrap: break-word;
+    }
+
+    tbody tr {
+      background: rgba(0,0,0,0.35);
+      transition: all 0.22s ease;
+    }
+    
+    tbody tr:hover { 
+      background: linear-gradient(90deg, rgba(0,183,199,0.02), rgba(192,0,199,0.015));
+      transform: translateX(6px);
+    }
+
+    .timestamp-cell {
+      font-family: 'Courier New', monospace;
+      color: #b8ddea;
+      font-size: 14px;
+    }
+
+    .date-time {
+      display: block;
+      margin-bottom: 8px;
+      font-weight: 600;
+    }
+
+    .input-method {
+      display: inline-block;
+      padding: 4px 10px;
+      border-radius: 6px;
+      font-size: 12px;
+      font-weight: 600;
+      margin-top: 6px;
+    }
+
+    .method-text {
+      background: rgba(0,183,199,0.1);
+      color: var(--primary);
+    }
+
+    .method-voice {
+      background: rgba(192,0,199,0.1);
+      color: var(--secondary);
+    }
+
+    .response-time {
+      margin-top: 8px;
+      font-size: 13px;
+      color: var(--accent);
+      font-weight: 600;
+    }
+
+    .user-message {
+      color: #aefce8;
+      font-size: 15px;
+    }
+
+    .bot-message {
+      color: #ffe4a8;
+      font-size: 15px;
+    }
+
+    .loading, .no-data {
+      text-align: center;
+      padding: 40px !important;
+      color: #7f95a0;
+      font-size: 16px;
+      font-weight: 600;
+    }
+
+    .confirmation-modal {
+      display:none;
+      position: fixed;
+      inset: 0;
+      z-index: 40;
+      background: rgba(2,4,10,0.85);
+      backdrop-filter: blur(8px);
+      align-items: center;
+      justify-content:center;
+      padding: 20px;
+    }
+
+    .modal-content{
+      width: 100%;
+      max-width: 440px;
+      background: linear-gradient(180deg, rgba(6,8,16,0.96), rgba(10,12,20,0.98));
+      padding: 28px;
+      border-radius: 16px;
+      border: 1px solid rgba(217,75,75,0.2);
+      text-align:center;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.8);
+    }
+
+    .modal-content h3 {
+      color: var(--danger);
+      font-size: 24px;
+      margin-bottom: 16px;
+      font-family: 'Orbitron', sans-serif;
+    }
+
+    .modal-content p {
+      color: var(--text);
+      font-size: 15px;
+      margin-bottom: 24px;
+      line-height: 1.6;
+    }
+
+    .modal-buttons {
+      display: flex;
+      gap: 12px;
+      justify-content: center;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .fade-in {
+      animation: fadeIn 0.5s ease-out forwards;
+    }
+
+    @media (max-width: 900px) {
+      h1 { font-size: 28px; }
+      tbody td { font-size: 14px; }
+      .btn { padding: 12px 20px; font-size: 14px; }
+    }
+  </style>
+</head>
+<body>
+
+  <canvas id="neural-bg"></canvas>
+
+  <div class="container">
+    <h1>🌌 Chat History Dashboard</h1>
+
+    <div class="header-card fade-in">
+      <div>
+        <div class="meta" id="header-meta">📂 Loading conversation history...</div>
+        <div class="sub">Auto-refresh every 30s</div>
+      </div>
+    </div>
+
+    <div class="controls">
+      <a href="{{ url_for('intex') }}" class="btn btn-primary">⬅ Back to Assistant</a>
+      <button class="btn btn-danger" onclick="showClearConfirmation()">🗑️ Clear History</button>
+    </div>
+
+    <div class="history-table fade-in">
+      <table>
+        <thead>
+          <tr>
+            <th style="width: 20%;">📅 Date & Time</th>
+            <th style="width: 40%;">💬 Your Message</th>
+            <th style="width: 40%;">🤖 AI Response</th>
+          </tr>
+        </thead>
+        <tbody id="history-table-body">
+          <tr>
+            <td colspan="3" class="loading">
+              🔄 Loading conversation history...
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+  </div>
+
+  <div id="confirmation-modal" class="confirmation-modal">
+    <div class="modal-content">
+      <h3>⚠️ Confirm Action</h3>
+      <p>Are you sure you want to clear all chat history? This action cannot be undone.</p>
+      <div class="modal-buttons">
+        <button class="btn btn-primary" onclick="hideClearConfirmation()">Cancel</button>
+        <button class="btn btn-danger" onclick="clearHistory()">Yes, Clear All</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const BACKEND_URL = "http://localhost:5000";
+    let chatHistory = [];
+
+    function initializePage() {
+      loadHistoryFromBackend();
+      setInterval(() => {
+        console.log('Auto-refreshing history...');
+        loadHistoryFromBackend();
+      }, 30000);
+    }
+
+    async function loadHistoryFromBackend() {
+      try {
+        console.log('Loading history from backend...');
+        const response = await fetch(`${BACKEND_URL}/api/history?limit=100`);
+        
+        if (!response.ok) {
+          throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+        }
+        
+        const data = await response.json();
+
+        if (data.success) {
+          chatHistory = data.history || [];
+          console.log(`Loaded ${chatHistory.length} history entries`);
+          displayHistory();
+          updateHeaderStats();
+        } else {
+          throw new Error(data.error || 'Failed to load history');
+        }
+      } catch (error) {
+        console.error('Error loading history:', error);
+        showError(`Failed to load history: ${error.message}`);
+        displayNoHistory();
+      }
+    }
+
+    function displayHistory() {
+      const tbody = document.getElementById('history-table-body');
+
+      if (!chatHistory || chatHistory.length === 0) {
+        displayNoHistory();
+        return;
+      }
+
+      tbody.innerHTML = chatHistory.map(entry => {
+        const inputMethod = (entry.input_method || 'text').toLowerCase();
+        const methodClass = inputMethod === 'voice' ? 'method-voice' : 'method-text';
+        const methodIcon = inputMethod === 'voice' ? '🎙️' : '⌨️';
+        const responseTime = entry.response_time || '0.5s';
+        const timestamp = entry.timestamp || new Date().toISOString();
+
+        return `
+          <tr class="fade-in">
+            <td class="timestamp-cell">
+              <span class="date-time">${escapeHtml(timestamp)}</span>
+              <span class="input-method ${methodClass}">${methodIcon} ${escapeHtml(inputMethod)}</span>
+              <div class="response-time">⚡ ${escapeHtml(responseTime)}</div>
+            </td>
+            <td class="user-message">${escapeHtml(entry.user || entry.user_message || '')}</td>
+            <td class="bot-message">${escapeHtml(entry.bot || entry.bot_response || '')}</td>
+          </tr>
+        `;
+      }).join('');
+    }
+
+    function displayNoHistory() {
+      const tbody = document.getElementById('history-table-body');
+      tbody.innerHTML = `
+        <tr>
+          <td colspan="3" class="no-data">
+            🔭 No conversation history found. Start chatting to see your history here!
+          </td>
+        </tr>
+      `;
+    }
+
+    function updateHeaderStats() {
+      const meta = document.getElementById('header-meta');
+      const total = chatHistory.length;
+      const today = chatHistory.filter(c => {
+        const date = new Date(c.timestamp || c.date);
+        const now = new Date();
+        return date.toDateString() === now.toDateString();
+      }).length;
+      
+      meta.textContent = `📂 Conversation History - Total: ${total} | Today: ${today}`;
+    }
+
+    function escapeHtml(text) {
+      if (text === undefined || text === null) return '';
+      const div = document.createElement('div');
+      div.textContent = String(text);
+      return div.innerHTML;
+    }
+
+    function showClearConfirmation() {
+      if (!chatHistory || chatHistory.length === 0) {
+        alert('No history to clear!');
+        return;
+      }
+      const modal = document.getElementById('confirmation-modal');
+      modal.style.display = 'flex';
+    }
+
+    function hideClearConfirmation() {
+      const modal = document.getElementById('confirmation-modal');
+      modal.style.display = 'none';
+    }
+
+    async function clearHistory() {
+      try {
+        console.log('Clearing history...');
+        const response = await fetch(`${BACKEND_URL}/api/history/clear`, {
+          method: 'POST',
+          headers: {'Content-Type': 'application/json'}
+        });
+        
+        if (!response.ok) {
+          throw new Error(`HTTP ${response.status}`);
+        }
+        
+        const data = await response.json();
+
+        if (data.success) {
+          chatHistory = [];
+          displayNoHistory();
+          hideClearConfirmation();
+          updateHeaderStats();
+          alert('✅ Chat history cleared successfully!');
+        } else {
+          throw new Error(data.error || 'Failed to clear history');
+        }
+      } catch (error) {
+        console.error('Error clearing history:', error);
+        alert(`❌ Failed to clear history: ${error.message}`);
+        hideClearConfirmation();
+      }
+    }
+
+    function showError(msg) {
+      console.error(msg);
+    }
+
+    document.addEventListener('DOMContentLoaded', initializePage);
+  </script>
+
+  <script>
+    // Neural particle animation
+    (function(){
+      const canvas = document.getElementById('neural-bg');
+      const ctx = canvas.getContext('2d');
+      let W = canvas.width = innerWidth;
+      let H = canvas.height = innerHeight;
+      const particles = [];
+      const COUNT = Math.max(60, Math.floor((W*H)/17000));
+      const MAX_DIST = 130;
+
+      class P {
+        constructor(){
+          this.reset();
+        }
+        reset(){
+          this.x = Math.random()*W;
+          this.y = Math.random()*H;
+          this.vx = (Math.random()-0.5) * 0.5;
+          this.vy = (Math.random()-0.5) * 0.5;
+          this.r = 0.7 + Math.random()*1.6;
+          this.alpha = 0.18 + Math.random()*0.5;
+        }
+        update(){
+          this.x += this.vx;
+          this.y += this.vy;
+          if(this.x < -20 || this.x > W + 20) this.vx *= -1;
+          if(this.y < -20 || this.y > H + 20) this.vy *= -1;
+        }
+        draw(){
+          ctx.beginPath();
+          ctx.arc(this.x, this.y, this.r, 0, Math.PI*2);
+          ctx.fillStyle = `rgba(0,183,199,${this.alpha})`;
+          ctx.fill();
+        }
+      }
+
+      function init(){
+        particles.length = 0;
+        for(let i=0;i<COUNT;i++) particles.push(new P());
+      }
+
+      function connect(){
+        for(let i=0;i<particles.length;i++){
+          for(let j=i+1;j<particles.length;j++){
+            const a = particles[i], b = particles[j];
+            const dx = a.x - b.x;
+            const dy = a.y - b.y;
+            const d = Math.sqrt(dx*dx+dy*dy);
+            if(d < MAX_DIST){
+              const t = 1 - d/MAX_DIST;
+              ctx.beginPath();
+              ctx.moveTo(a.x, a.y);
+              ctx.lineTo(b.x, b.y);
+              ctx.strokeStyle = `rgba(0,183,199,${0.05 * t})`;
+              ctx.lineWidth = 0.5 * t;
+              ctx.stroke();
+            }
+          }
+        }
+      }
+
+      function loop(){
+        ctx.clearRect(0,0,W,H);
+        for(const p of particles){ p.update(); p.draw(); }
+        connect();
+        requestAnimationFrame(loop);
+      }
+
+      window.addEventListener('resize', () => {
+        W = canvas.width = innerWidth;
+        H = canvas.height = innerHeight;
+        init();
+      });
+
+      init();
+      loop();
+    })();
+  </script>
+
+</body>
+</html>

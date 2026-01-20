@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Personal Assistant Portal</title>
+    <link href="https://fonts.googleapis.com/css2?family=Exo+2:wght@300;400;600;700&family=Orbitron:wght@700;900&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Exo 2', sans-serif;
+            background-color: #0a0a0a;
+            color: #fff;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        #neural-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+            opacity: 0.4;
+        }
+
+        body::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: repeating-linear-gradient(
+                to bottom,
+                transparent 0px,
+                transparent 1px,
+                rgba(0, 247, 255, 0.05) 1px,
+                rgba(0, 247, 255, 0.05) 2px
+            );
+            pointer-events: none;
+            animation: scan 4s linear infinite;
+            z-index: 1;
+        }
+
+        @keyframes scan {
+            0% { background-position: 0 0; }
+            100% { background-position: 0 100%; }
+        }
+
+        .portal {
+            position: relative;
+            width: 90%;
+            max-width: 550px;
+            padding: 4rem 3rem;
+            background: rgba(10, 20, 30, 0.95);
+            border-radius: 20px;
+            border: 2px solid rgba(0, 247, 255, 0.4);
+            box-shadow: 
+                0 0 40px rgba(0, 247, 255, 0.3),
+                0 0 80px rgba(0, 127, 255, 0.2),
+                inset 0 0 20px rgba(0, 247, 255, 0.1);
+            text-align: center;
+            z-index: 2;
+            backdrop-filter: blur(15px);
+            transition: transform 0.3s ease;
+            animation: fadeIn 0.8s ease;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: scale(0.95);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        .portal:hover {
+            transform: translateY(-5px);
+            box-shadow: 
+                0 0 50px rgba(0, 247, 255, 0.4),
+                0 0 100px rgba(0, 127, 255, 0.3);
+        }
+
+        h1 {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 2.8rem;
+            margin-bottom: 1.5rem;
+            background: linear-gradient(90deg, #00f7ff, #00d4ff, #0096ff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            text-shadow: 0 0 30px rgba(0, 247, 255, 0.5);
+            letter-spacing: 3px;
+            font-weight: 900;
+        }
+
+        .tagline {
+            color: #88d4ff;
+            margin-bottom: 3rem;
+            font-size: 1.1rem;
+            letter-spacing: 1.5px;
+            opacity: 0.9;
+        }
+
+        .button-container {
+            display: flex;
+            gap: 2rem;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .access-btn {
+            display: inline-block;
+            padding: 1rem 2.5rem;
+            color: #00f7ff;
+            text-decoration: none;
+            font-weight: 600;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            border: 2px solid #00f7ff;
+            border-radius: 12px;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.3s ease;
+            min-width: 160px;
+            font-size: 0.95rem;
+        }
+
+        .access-btn:hover {
+            background: rgba(0, 247, 255, 0.2);
+            box-shadow: 0 0 25px rgba(0, 247, 255, 0.5);
+            transform: translateY(-3px);
+        }
+
+        .access-btn::before,
+        .access-btn::after {
+            content: '';
+            position: absolute;
+            width: 15px;
+            height: 15px;
+            transition: all 0.3s ease;
+        }
+
+        .access-btn::before {
+            top: -2px;
+            left: -2px;
+            border-top: 2px solid #00f7ff;
+            border-left: 2px solid #00f7ff;
+        }
+
+        .access-btn::after {
+            bottom: -2px;
+            right: -2px;
+            border-bottom: 2px solid #00f7ff;
+            border-right: 2px solid #00f7ff;
+        }
+
+        .access-btn:hover::before,
+        .access-btn:hover::after {
+            width: calc(100% + 4px);
+            height: calc(100% + 4px);
+        }
+
+        @media (max-width: 600px) {
+            h1 { 
+                font-size: 2.2rem; 
+                letter-spacing: 2px;
+            }
+            .portal { 
+                padding: 3rem 2rem; 
+                max-width: 90%;
+            }
+            .access-btn { 
+                padding: 0.9rem 2rem; 
+                min-width: 140px; 
+            }
+            .button-container { 
+                flex-direction: column; 
+                align-items: center;
+                gap: 1.5rem;
+            }
+            .tagline {
+                font-size: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <canvas id="neural-bg"></canvas>
+
+    <div class="portal">
+        <h1>🤖 AI ASSISTANT</h1>
+        <p class="tagline">Access your AI assistant or create a new account.</p>
+        <div class="button-container">
+            <a href="{{ url_for('login') }}" class="access-btn">Login</a>
+            <a href="{{ url_for('signup') }}" class="access-btn">SignUp</a>
+        </div>
+    </div>
+
+    <script>
+        const canvas = document.getElementById('neural-bg');
+        const ctx = canvas.getContext('2d');
+        
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+        
+        const particles = [];
+        const particleCount = 80;
+        const connectionDistance = 150;
+        
+        class Particle {
+            constructor() {
+                this.x = Math.random() * canvas.width;
+                this.y = Math.random() * canvas.height;
+                this.vx = (Math.random() - 0.5) * 0.5;
+                this.vy = (Math.random() - 0.5) * 0.5;
+                this.radius = Math.random() * 2 + 1;
+            }
+            
+            update() {
+                this.x += this.vx;
+                this.y += this.vy;
+                
+                if (this.x < 0 || this.x > canvas.width) this.vx *= -1;
+                if (this.y < 0 || this.y > canvas.height) this.vy *= -1;
+            }
+            
+            draw() {
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+                ctx.fillStyle = 'rgba(0, 247, 255, 0.6)';
+                ctx.fill();
+            }
+        }
+        
+        for (let i = 0; i < particleCount; i++) {
+            particles.push(new Particle());
+        }
+        
+        function connectParticles() {
+            for (let i = 0; i < particles.length; i++) {
+                for (let j = i + 1; j < particles.length; j++) {
+                    const dx = particles[i].x - particles[j].x;
+                    const dy = particles[i].y - particles[j].y;
+                    const distance = Math.sqrt(dx * dx + dy * dy);
+                    
+                    if (distance < connectionDistance) {
+                        ctx.beginPath();
+                        ctx.strokeStyle = `rgba(0, 247, 255, ${0.3 * (1 - distance / connectionDistance)})`;
+                        ctx.lineWidth = 0.5;
+                        ctx.moveTo(particles[i].x, particles[i].y);
+                        ctx.lineTo(particles[j].x, particles[j].y);
+                        ctx.stroke();
+                    }
+                }
+            }
+        }
+        
+        function animate() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            particles.forEach(particle => {
+                particle.update();
+                particle.draw();
+            });
+            
+            connectParticles();
+            requestAnimationFrame(animate);
+        }
+        
+        animate();
+        
+        window.addEventListener('resize', () => {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        });
+    </script>
+</body>
+</html>
